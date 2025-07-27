@@ -1,0 +1,13 @@
+git add .
+
+git commit -m "Initial commit"
+
+git push 
+
+git branch 
+
+git checkout -b "master"
+
+git init
+
+git clone url
