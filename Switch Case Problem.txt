@@ -1,0 +1,33 @@
+#include <stdio.h>
+int main() 
+{
+    int car, i;
+    for (i = 0; i < 5; i++) 
+    {
+        printf("Enter any car CC between 1000 to 5000: ");
+        scanf("%d", &car);
+
+        switch(car) 
+        {
+            case 1000:
+                printf("i20\n");
+                break;
+            case 2000:
+                printf("Thar\n");
+                break;
+            case 3000:
+                printf("Innova Crysta\n");
+                break;
+            case 4000:
+                printf("Fortuner\n");
+                break;
+            case 5000:
+                printf("BWM GT\n");
+                break;
+            default:
+                printf("Invalid Input\n");
+                break;
+        }
+    }
+    return 0;
+}
