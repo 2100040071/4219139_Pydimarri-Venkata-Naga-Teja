@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+int sortCompare(const void *x, const void *y) 
+{
+    return (*(int *)x - *(int *)y);
+}
+char* checkTwoArrays(int minSum, int lenA, int arrA[], int lenB, int arrB[]) 
+{
+    qsort(arrA, lenA, sizeof(int), sortCompare);
+    qsort(arrB, lenB, sizeof(int), sortCompare);
+    for (int i = 0; i < lenA; i++) {
+        if (arrA[i] + arrB[lenB - 1 - i] < minSum) 
+        {
+            return "NO";
+        }
+    }
+    return "YES";
+}
+int main() 
+{
+    int testCases;
+    scanf("%d", &testCases);
+    while (testCases--) 
+    {
+        int size, target;
+        scanf("%d %d", &size, &target);
+        int firstArr[size], secondArr[size];
+        for (int i = 0; i < size; i++) 
+        {
+            scanf("%d", &firstArr[i]);
+        }
+        for (int i = 0; i < size; i++) 
+        {
+            scanf("%d", &secondArr[i]);
+        }
+        printf("%s\n", checkTwoArrays(target, size, firstArr, size, secondArr));
+    }
+    return 0;
+}
