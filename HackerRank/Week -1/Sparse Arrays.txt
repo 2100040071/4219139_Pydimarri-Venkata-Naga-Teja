@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_WORDS 1000
+#define MAX_LENGTH 1001
+void findQueryMatches(char words[][MAX_LENGTH], int wordCount, char searchList[][MAX_LENGTH], int searchCount, int matchCount[]) 
+{
+    for (int q = 0; q < searchCount; q++) {
+        int count = 0;
+        for (int w = 0; w < wordCount; w++) {
+            if (strcmp(searchList[q], words[w]) == 0) {
+                count++;
+            }
+        }
+        matchCount[q] = count;
+    }
+}
+int main() {
+    int numWords;
+    scanf("%d", &numWords);
+    char wordArray[MAX_WORDS][MAX_LENGTH];
+    for (int i = 0; i < numWords; i++) {
+        scanf("%s", wordArray[i]);
+    }
+    int numSearch;
+    scanf("%d", &numSearch);
+    char searchArray[MAX_WORDS][MAX_LENGTH];
+    int resultArray[MAX_WORDS];
+    for (int i = 0; i < numSearch; i++) {
+        scanf("%s", searchArray[i]);
+    }
+    findQueryMatches(wordArray, numWords, searchArray, numSearch, resultArray);
+    for (int i = 0; i < numSearch; i++) {
+        printf("%d\n", resultArray[i]);
+    }
+    return 0;
+}
