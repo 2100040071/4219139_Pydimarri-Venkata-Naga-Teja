@@ -1,0 +1,73 @@
+1.
+#include <stdio.h>
+#include <stdlib.h>
+
+int sortAscending(const void *x, const void *y) {
+    return (*(int *)x - *(int *)y);
+}
+
+int getMedian(int numbers[], int size) {
+    qsort(numbers, size, sizeof(int), sortAscending);
+    int middle = size / 2;
+    return numbers[middle];
+}
+
+int main() {
+    int count;
+    scanf("%d", &count);
+
+    int data[count];
+    for (int i = 0; i < count; i++) {
+        scanf("%d", &data[i]);
+    }
+
+    printf("%d\n", getMedian(data, count));
+    return 0;
+}
+
+------------------------------------------------------
+2.
+#include <stdio.h>
+
+int maxValue(int x, int y) {
+    return (x > y) ? x : y;
+}
+
+int getMaxQuadrantSum(int halfSize, int grid[2 * halfSize][2 * halfSize]) {
+    int sum = 0;
+    int fullSize = 2 * halfSize;
+
+    for (int r = 0; r < halfSize; r++) {
+        for (int c = 0; c < halfSize; c++) {
+            int topLeft = grid[r][c];
+            int topRight = grid[r][fullSize - c - 1];
+            int bottomLeft = grid[fullSize - r - 1][c];
+            int bottomRight = grid[fullSize - r - 1][fullSize - c - 1];
+
+            int bestVal = maxValue(maxValue(topLeft, topRight), maxValue(bottomLeft, bottomRight));
+            sum += bestVal;
+        }
+    }
+    return sum;
+}
+
+int main() {
+    int testCases;
+    scanf("%d", &testCases);
+
+    while (testCases--) {
+        int n;
+        scanf("%d", &n);
+        int mat[2 * n][2 * n];
+
+        for (int i = 0; i < 2 * n; i++) {
+            for (int j = 0; j < 2 * n; j++) {
+                scanf("%d", &mat[i][j]);
+            }
+        }
+
+        printf("%d\n", getMaxQuadrantSum(n, mat));
+    }
+
+    return 0;
+}
