@@ -1,0 +1,28 @@
+#include <stdio.h>
+int countSockPairs(int totalSocks, int socks[]) 
+{
+    int sockColors[101] = {0};
+    int pairCount = 0;
+    for (int i = 0; i < totalSocks; i++) 
+    {
+        sockColors[socks[i]]++;
+    }
+    for (int i = 0; i < 101; i++) 
+    {
+        pairCount += sockColors[i] / 2;
+    }
+    return pairCount;
+}
+int main() 
+{
+    int numSocks;
+    scanf("%d", &numSocks);
+    int sockArray[numSocks];
+    for (int i = 0; i < numSocks; i++) 
+    {
+        scanf("%d", &sockArray[i]);
+    }
+    int pairs = countSockPairs(numSocks, sockArray);
+    printf("%d\n", pairs);
+    return 0;
+}
