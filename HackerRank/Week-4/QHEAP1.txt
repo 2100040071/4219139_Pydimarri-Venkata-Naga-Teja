@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXSIZE 100000
+int minHeap[MAXSIZE];
+int heapCount = 0;
+void swapVals(int *x, int *y) {
+    int temp = *x;
+    *x = *y;
+    *y = temp;
+}
+void moveUp(int idx) {
+    while (idx > 0 && minHeap[(idx - 1) / 2] > minHeap[idx]) {
+        swapVals(&minHeap[idx], &minHeap[(idx - 1) / 2]);
+        idx = (idx - 1) / 2;
+    }
+}
+void moveDown(int idx) {
+    int smallest = idx;
+    int leftChild = 2 * idx + 1;
+    int rightChild = 2 * idx + 2;
+    if (leftChild < heapCount && minHeap[leftChild] < minHeap[smallest]) 
+        smallest = leftChild;
+    if (rightChild < heapCount && minHeap[rightChild] < minHeap[smallest]) 
+        smallest = rightChild;
+    if (smallest != idx) {
+        swapVals(&minHeap[idx], &minHeap[smallest]);
+        moveDown(smallest);
+    }
+}
+void addValue(int value) {
+    minHeap[heapCount++] = value;
+    moveUp(heapCount - 1);
+}
+void removeValue(int value) {
+    int i;
+    for (i = 0; i < heapCount; i++) {
+        if (minHeap[i] == value) break;
+    }
+    if (i == heapCount) return;
+    swapVals(&minHeap[i], &minHeap[heapCount - 1]);
+    heapCount--;
+    moveUp(i);
+    moveDown(i);
+}
+int getMinimum() {
+    if (heapCount == 0) return -1;
+    return minHeap[0];
+}
+int main() {
+    int queries;
+    scanf("%d", &queries);
+    while (queries--) {
+        int type, num;
+        scanf("%d", &type);
+        if (type == 1) {
+            scanf("%d", &num);
+            addValue(num);
+        } else if (type == 2) {
+            scanf("%d", &num);
+            removeValue(num);
+        } else if (type == 3) {
+            printf("%d\n", getMinimum());
+        }
+    }
+    return 0;
+}

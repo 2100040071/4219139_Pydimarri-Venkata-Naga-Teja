@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define MOD 1000000007
+char* read_line();
+char* trim_left(char*);
+char* trim_right(char*);
+char** split_tokens(char*);
+int to_int(char*);
+long long mod_power(long long base, int exp) {
+    long long res = 1;
+    while (exp > 0) {
+        if (exp & 1) res = (res * base) % MOD;
+        base = (base * base) % MOD;
+        exp >>= 1;
+    }
+    return res;
+}
+int countLegoWays(int height, int width) {
+    long long row_config[1005] = {0};
+    long long total_grid[1005] = {0};
+    long long solid_grid[1005] = {0};
+    row_config[0] = 1;
+    for (int i = 1; i <= width; i++) {
+        if (i >= 1) row_config[i] = (row_config[i] + row_config[i - 1]) % MOD;
+        if (i >= 2) row_config[i] = (row_config[i] + row_config[i - 2]) % MOD;
+        if (i >= 3) row_config[i] = (row_config[i] + row_config[i - 3]) % MOD;
+        if (i >= 4) row_config[i] = (row_config[i] + row_config[i - 4]) % MOD;
+    }
+    for (int i = 1; i <= width; i++) {
+        total_grid[i] = mod_power(row_config[i], height);
+    }
+    solid_grid[1] = total_grid[1];
+    for (int i = 2; i <= width; i++) {
+        solid_grid[i] = total_grid[i];
+        for (int j = 1; j < i; j++) {
+            solid_grid[i] = (solid_grid[i] - (solid_grid[j] * total_grid[i - j]) % MOD + MOD) % MOD;
+        }
+    }
+    return (int)solid_grid[width];
+}
+int main() {
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
+    int t = to_int(trim_left(trim_right(read_line())));
+    while (t--) {
+        char** input = split_tokens(trim_right(read_line()));
+        int n = to_int(input[0]);
+        int m = to_int(input[1]);
+        int ans = countLegoWays(n, m);
+        fprintf(fptr, "%d\n", ans);
+        free(input);
+    }
+    fclose(fptr);
+    return 0;
+}
+char* read_line() {
+    size_t cap = 1024, len = 0;
+    char* buffer = malloc(cap);
+    while (1) {
+        char* ptr = buffer + len;
+        char* line = fgets(ptr, cap - len, stdin);
+        if (!line) break;
+        len += strlen(ptr);
+        if (len < cap - 1 || buffer[len - 1] == '\n') break;
+        cap *= 2;
+        buffer = realloc(buffer, cap);
+    }
+    if (len > 0 && buffer[len - 1] == '\n') buffer[len - 1] = '\0';
+    return buffer;
+}
+char* trim_left(char* str) {
+    while (*str && isspace(*str)) str++;
+    return str;
+}
+char* trim_right(char* str) {
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) end--;
+    *(end + 1) = '\0';
+    return str;
+}
+char** split_tokens(char* str) {
+    char** arr = NULL;
+    int count = 0;
+    char* token = strtok(str, " ");
+    while (token) {
+        arr = realloc(arr, sizeof(char*) * (count + 1));
+        arr[count++] = token;
+        token = strtok(NULL, " ");
+    }
+    return arr;
+}
+int to_int(char* s) {
+    char* endptr;
+    int val = strtol(s, &endptr, 10);
+    if (*endptr != '\0') exit(EXIT_FAILURE);
+    return val;
+}

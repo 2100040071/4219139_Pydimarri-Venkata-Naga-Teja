@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define SIZE 100000
+int s1[SIZE], s2[SIZE];
+int topS1 = -1, topS2 = -1;
+void pushS1(int value) {
+    s1[++topS1] = value;
+}
+int popS1() {
+    return (topS1 == -1) ? -1 : s1[topS1--];
+}
+void pushS2(int value) {
+    s2[++topS2] = value;
+}
+int popS2() {
+    return (topS2 == -1) ? -1 : s2[topS2--];
+}
+int isEmptyS2() {
+    return (topS2 == -1);
+}
+int peekS2() {
+    return (topS2 == -1) ? -1 : s2[topS2];
+}
+void moveElements() {
+    while (topS1 != -1) {
+        pushS2(popS1());
+    }
+}
+
+int main() {
+    int queries;
+    scanf("%d", &queries);
+
+    for (int i = 0; i < queries; i++) {
+        int type;
+        scanf("%d", &type);
+
+        if (type == 1) {       
+            int num;
+            scanf("%d", &num);
+            pushS1(num);
+        } 
+        else if (type == 2) {  
+            if (isEmptyS2()) {
+                moveElements();
+            }
+            popS2();
+        } 
+        else if (type == 3) {  
+            if (isEmptyS2()) {
+                moveElements();
+            }
+            printf("%d\n", peekS2());
+        }
+    }
+
+    return 0;
+}

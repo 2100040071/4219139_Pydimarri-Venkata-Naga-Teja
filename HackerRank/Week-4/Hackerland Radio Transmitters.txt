@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
+char* read_line();
+char* trim_left(char*);
+char* trim_right(char*);
+char** split_input(char*);
+int str_to_int(char*);
+int cmp(const void* a, const void* b) {
+    return (*(int*)a - *(int*)b);
+}
+int minTransmitters(int houseCount, int* houses, int range) {
+    qsort(houses, houseCount, sizeof(int), cmp);
+    int transmitters = 0;
+    int idx = 0;
+    while (idx < houseCount) {
+        transmitters++;
+        int coverage = houses[idx] + range;
+        while (idx < houseCount && houses[idx] <= coverage) 
+            idx++;
+        int towerPos = houses[idx - 1];
+        coverage = towerPos + range;
+        while (idx < houseCount && houses[idx] <= coverage) 
+            idx++;
+    }
+    return transmitters;
+}
+int main() {
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
+    char** firstInput = split_input(trim_right(read_line()));
+    int numHouses = str_to_int(*(firstInput + 0));
+    int transmitterRange = str_to_int(*(firstInput + 1));
+    char** positions = split_input(trim_right(read_line()));
+    int* houses = malloc(numHouses * sizeof(int));
+    for (int i = 0; i < numHouses; i++) {
+        houses[i] = str_to_int(*(positions + i));
+    }
+    int result = minTransmitters(numHouses, houses, transmitterRange);
+    fprintf(fptr, "%d\n", result);
+    fclose(fptr);
+    return 0;
+}
+char* read_line() {
+    size_t size = 1024, length = 0;
+    char* buffer = malloc(size);
+    while (true) {
+        char* cursor = buffer + length;
+        char* line = fgets(cursor, size - length, stdin);
+        if (!line) break;
+        length += strlen(cursor);
+        if (length < size - 1 || buffer[length - 1] == '\n') break;
+        size <<= 1;
+        buffer = realloc(buffer, size);
+    }
+    if (buffer[length - 1] == '\n') buffer[length - 1] = '\0';
+    return buffer;
+}
+char* trim_left(char* str) {
+    if (!str) return NULL;
+    while (*str && isspace(*str)) str++;
+    return str;
+}
+char* trim_right(char* str) {
+    if (!str) return NULL;
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) end--;
+    *(end + 1) = '\0';
+    return str;
+}
+char** split_input(char* str) {
+    char** tokens = NULL;
+    char* word = strtok(str, " ");
+    int count = 0;
+    while (word) {
+        tokens = realloc(tokens, sizeof(char*) * ++count);
+        tokens[count - 1] = word;
+        word = strtok(NULL, " ");
+    }
+    return tokens;
+}
+int str_to_int(char* str) {
+    char* endptr;
+    int value = strtol(str, &endptr, 10);
+    if (endptr == str || *endptr != '\0') exit(EXIT_FAILURE);
+    return value;
+}

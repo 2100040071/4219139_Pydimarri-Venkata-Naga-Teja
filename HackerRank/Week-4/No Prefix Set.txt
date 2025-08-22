@@ -1,0 +1,144 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+char* getLine();
+char* leftTrim(char*);
+char* rightTrim(char*);
+int toInt(char*);
+#define CHAR_RANGE 10 
+typedef struct Node {
+    struct Node* next[CHAR_RANGE];
+    bool isCompleteWord;
+} Node;
+Node* makeNode() {
+    Node* fresh = (Node*)malloc(sizeof(Node));
+    fresh->isCompleteWord = false;
+    for (int i = 0; i < CHAR_RANGE; i++)
+        fresh->next[i] = NULL;
+    return fresh;
+}
+
+bool addAndValidate(Node* root, char* str) {
+    Node* crawl = root;
+
+    for (int k = 0; str[k]; k++) {
+        int idx = str[k] - 'a';
+
+        if (crawl->next[idx] == NULL) {
+            crawl->next[idx] = makeNode();
+        }
+
+        crawl = crawl->next[idx];
+
+        if (crawl->isCompleteWord) {
+            return false; 
+        }
+    }
+
+    for (int j = 0; j < CHAR_RANGE; j++) {
+        if (crawl->next[j] != NULL) {
+            return false; 
+        }
+    }
+
+    crawl->isCompleteWord = true;
+    return true;
+}
+
+void checkNoPrefix(int total, char** wordList) {
+    Node* base = makeNode();
+
+    for (int i = 0; i < total; i++) {
+        if (!addAndValidate(base, wordList[i])) {
+            printf("BAD SET\n%s\n", wordList[i]);
+            return;
+        }
+    }
+
+    printf("GOOD SET\n");
+}
+
+int main() {
+    int count = toInt(leftTrim(rightTrim(getLine())));
+
+    char** dictionary = malloc(count * sizeof(char*));
+
+    for (int i = 0; i < count; i++) {
+        char* entry = getLine();
+        dictionary[i] = entry;
+    }
+
+    checkNoPrefix(count, dictionary);
+
+    return 0;
+}
+
+char* getLine() {
+    size_t alloc_len = 1024;
+    size_t str_len = 0;
+
+    char* buffer = malloc(alloc_len);
+
+    while (true) {
+        char* pos = buffer + str_len;
+        char* line = fgets(pos, alloc_len - str_len, stdin);
+
+        if (!line) break;
+
+        str_len += strlen(pos);
+
+        if (str_len < alloc_len - 1 || buffer[str_len - 1] == '\n') break;
+
+        alloc_len <<= 1;
+        buffer = realloc(buffer, alloc_len);
+
+        if (!buffer) {
+            buffer = '\0';
+            break;
+        }
+    }
+
+    if (buffer[str_len - 1] == '\n') {
+        buffer[str_len - 1] = '\0';
+        buffer = realloc(buffer, str_len);
+    } else {
+        buffer = realloc(buffer, str_len + 1);
+        buffer[str_len] = '\0';
+    }
+
+    return buffer;
+}
+
+char* leftTrim(char* s) {
+    if (!s) return '\0';
+    while (*s != '\0' && isspace(*s)) s++;
+    return s;
+}
+
+char* rightTrim(char* s) {
+    if (!s) return '\0';
+    if (!*s) return s;
+
+    char* end = s + strlen(s) - 1;
+    while (end >= s && isspace(*end)) end--;
+    *(end + 1) = '\0';
+
+    return s;
+}
+
+int toInt(char* s) {
+    char* endptr;
+    int val = strtol(s, &endptr, 10);
+
+    if (endptr == s || *endptr != '\0') {
+        exit(EXIT_FAILURE);
+    }
+    return val;
+}

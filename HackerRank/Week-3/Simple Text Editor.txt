@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define LIMIT 1000000
+typedef struct {
+    char** history;
+    int head;
+    int capacity;
+} UndoStack;
+void initUndo(UndoStack* st, int size) {
+    st->history = malloc(size * sizeof(char*));
+    st->head = -1;
+    st->capacity = size;
+}
+void pushState(UndoStack* st, const char* str) {
+    if (st->head == st->capacity - 1) {
+        st->capacity *= 2;
+        st->history = realloc(st->history, st->capacity * sizeof(char*));
+    }
+    st->history[++st->head] = strdup(str);
+}
+char* popState(UndoStack* st) {
+    if (st->head < 0) return NULL;
+    return st->history[st->head--];
+}
+void clearUndo(UndoStack* st) {
+    while (st->head >= 0) {
+        free(st->history[st->head--]);
+    }
+    free(st->history);
+}
+int main() {
+    int queries;
+    scanf("%d", &queries);
+    char* editor = malloc(1);
+    editor[0] = '\0';
+    int len = 0;
+    UndoStack stack;
+    initUndo(&stack, 100);
+    for (int i = 0; i < queries; i++) {
+        int command;
+        scanf("%d", &command);
+        if (command == 1) {
+            char buffer[100001];
+            scanf("%s", buffer);
+            pushState(&stack, editor);
+            int addLen = strlen(buffer);
+            editor = realloc(editor, len + addLen + 1);
+            strcpy(editor + len, buffer);
+            len += addLen;
+        } else if (command == 2) {
+            int k;
+            scanf("%d", &k);
+            pushState(&stack, editor);
+            len -= k;
+            editor[len] = '\0';
+        } else if (command == 3) {
+            int k;
+            scanf("%d", &k);
+            printf("%c\n", editor[k - 1]);
+        } else if (command == 4) {
+            char* prev = popState(&stack);
+            if (prev) {
+                free(editor);
+                editor = prev;
+                len = strlen(editor);
+            }
+        }
+    }
+    free(editor);
+    clearUndo(&stack);
+    return 0;
+}

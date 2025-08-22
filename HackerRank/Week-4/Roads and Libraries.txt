@@ -1,0 +1,159 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+char* read_line();
+char* left_trim(char*);
+char* right_trim(char*);
+char** split_words(char*);
+int to_int(char*);
+typedef struct Link {
+    int dest;
+    struct Link* next;
+} Link;
+#define LIMIT 100001
+Link* adjList[LIMIT];
+bool isVisited[LIMIT];
+void insert_edge(int a, int b) {
+    Link* temp = malloc(sizeof(Link));
+    temp->dest = b;
+    temp->next = adjList[a];
+    adjList[a] = temp;
+}
+int depth_first(int start) {
+    int stk[LIMIT], topIndex = -1;
+    stk[++topIndex] = start;
+    int nodes = 0;
+    while (topIndex >= 0) {
+        int cur = stk[topIndex--];
+        if (!isVisited[cur]) {
+            isVisited[cur] = true;
+            nodes++;
+            for (Link* t = adjList[cur]; t != NULL; t = t->next) {
+                if (!isVisited[t->dest]) {
+                    stk[++topIndex] = t->dest;
+                }
+            }
+        }
+    }
+    return nodes;
+}
+long calc_roads_libraries(int cityCount, int libCost, int roadCost, int edges, int col, int** pairs) {
+    if (libCost <= roadCost) {
+        return (long)cityCount * libCost;
+    }
+
+    for (int i = 1; i <= cityCount; i++) {
+        adjList[i] = NULL;
+        isVisited[i] = false;
+    }
+    for (int i = 0; i < edges; i++) {
+        int x = pairs[i][0];
+        int y = pairs[i][1];
+        insert_edge(x, y);
+        insert_edge(y, x);
+    }
+    long total = 0;
+    for (int node = 1; node <= cityCount; node++) {
+        if (!isVisited[node]) {
+            int compSize = depth_first(node);
+            total += libCost + (long)(compSize - 1) * roadCost;
+        }
+    }
+    return total;
+}
+int main() {
+    FILE* out = fopen(getenv("OUTPUT_PATH"), "w");
+    int queries = to_int(left_trim(right_trim(read_line())));
+    for (int t = 0; t < queries; t++) {
+        char** firstLine = split_words(right_trim(read_line()));
+        int nCities = to_int(*(firstLine + 0));
+        int nRoads = to_int(*(firstLine + 1));
+        int costLib = to_int(*(firstLine + 2));
+        int costRoad = to_int(*(firstLine + 3));
+        int** edges = malloc(nRoads * sizeof(int*));
+        for (int i = 0; i < nRoads; i++) {
+            *(edges + i) = malloc(2 * sizeof(int));
+            char** temp = split_words(right_trim(read_line()));
+            for (int j = 0; j < 2; j++) {
+                int val = to_int(*(temp + j));
+                edges[i][j] = val;
+            }
+        }
+        long answer = calc_roads_libraries(nCities, costLib, costRoad, nRoads, 2, edges);
+        fprintf(out, "%ld\n", answer);
+    }
+    fclose(out);
+    return 0;
+}
+char* read_line() {
+    size_t alloc_len = 1024;
+    size_t data_len = 0;
+    char* buffer = malloc(alloc_len);
+    while (true) {
+        char* cursor = buffer + data_len;
+        char* line = fgets(cursor, alloc_len - data_len, stdin);
+        if (!line) break;
+        data_len += strlen(cursor);
+        if (data_len < alloc_len - 1 || buffer[data_len - 1] == '\n') break;
+        alloc_len <<= 1;
+        buffer = realloc(buffer, alloc_len);
+        if (!buffer) {
+            buffer = '\0';
+            break;
+        }
+    }
+    if (buffer[data_len - 1] == '\n') {
+        buffer[data_len - 1] = '\0';
+        buffer = realloc(buffer, data_len);
+    } else {
+        buffer = realloc(buffer, data_len + 1);
+        buffer[data_len] = '\0';
+    }
+    return buffer;
+}
+char* left_trim(char* str) {
+    if (!str) return '\0';
+    if (!*str) return str;
+    while (*str != '\0' && isspace(*str)) {
+        str++;
+    }
+    return str;
+}
+char* right_trim(char* str) {
+    if (!str) return '\0';
+    if (!*str) return str;
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) {
+        end--;
+    }
+    *(end + 1) = '\0';
+    return str;
+}
+char** split_words(char* str) {
+    char** parts = NULL;
+    char* token = strtok(str, " ");
+    int count = 0;
+
+    while (token) {
+        parts = realloc(parts, sizeof(char*) * ++count);
+        parts[count - 1] = token;
+        token = strtok(NULL, " ");
+    }
+    return parts;
+}
+
+int to_int(char* str) {
+    char* endptr;
+    int value = strtol(str, &endptr, 10);
+    if (endptr == str || *endptr != '\0') {
+        exit(EXIT_FAILURE);
+    }
+    return value;
+}
