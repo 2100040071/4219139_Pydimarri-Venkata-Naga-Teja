@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <math.h>
+#define LIMIT 50000
+int checkPrime(int val) {
+    if (val < 2) return 0;
+    for (int k = 2; k <= sqrt(val); k++) {
+        if (val % k == 0) return 0;
+    }
+    return 1;
+}
+void getPrimes(int primeList[], int total) {
+    int num = 2, idx = 0;
+    while (idx < total) {
+        if (checkPrime(num)) {
+            primeList[idx++] = num;
+        }
+        num++;
+    }
+}
+int main() {
+    int platesCount, rounds;
+    scanf("%d %d", &platesCount, &rounds);
+
+    int stackA[LIMIT], stackNext[LIMIT], stackB[LIMIT];
+    int topA = platesCount - 1;
+
+    for (int i = 0; i < platesCount; i++) {
+        scanf("%d", &stackA[i]); 
+    }
+
+    int primeNums[rounds];
+    getPrimes(primeNums, rounds);
+
+    for (int r = 0; r < rounds; r++) {
+        int topB = -1;
+        int topNext = -1;
+
+        while (topA >= 0) {
+            int dish = stackA[topA--];
+            if (dish % primeNums[r] == 0) {
+                stackB[++topB] = dish;
+            } else {
+                stackNext[++topNext] = dish;
+            }
+        }
+
+        while (topB >= 0) {
+            printf("%d\n", stackB[topB--]);
+        }
+
+        topA = topNext;
+        for (int x = 0; x <= topNext; x++) {
+            stackA[x] = stackNext[x];
+        }
+    }
+
+    while (topA >= 0) {
+        printf("%d\n", stackA[topA--]);
+    }
+
+    return 0;
+}

@@ -1,0 +1,131 @@
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+char* read_line();
+char* trim_left(char*);
+char* trim_right(char*);
+char** split_tokens(char*);
+int convert_to_int(char*);
+int* findIcecreamPair(int money, int n, int* prices, int* result_size) 
+{
+    int* answer = malloc(2 * sizeof(int));
+    *result_size = 2;
+    for (int i = 0; i < n; i++) 
+    {
+        for (int j = i + 1; j < n; j++) 
+        {
+            if (prices[i] + prices[j] == money) 
+            {
+                answer[0] = i + 1;  
+                answer[1] = j + 1;
+                return answer;
+            }
+        }
+    }
+    free(answer);
+    *result_size = 0;
+    return NULL;
+}
+int main() 
+{
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
+    int test_cases = convert_to_int(trim_left(trim_right(read_line())));
+    for (int t = 0; t < test_cases; t++) 
+    {
+        int money = convert_to_int(trim_left(trim_right(read_line())));
+        int count = convert_to_int(trim_left(trim_right(read_line())));
+        char** temp_arr = split_tokens(trim_right(read_line()));
+        int* prices = malloc(count * sizeof(int));
+        for (int i = 0; i < count; i++)
+        {
+            int value = convert_to_int(*(temp_arr + i));
+            *(prices + i) = value;
+        }
+        int result_size;
+        int* result = findIcecreamPair(money, count, prices, &result_size);
+        for (int i = 0; i < result_size; i++) 
+        {
+            fprintf(fptr, "%d", *(result + i));
+            if (i != result_size - 1) 
+            {
+                fprintf(fptr, " ");
+            }
+        }
+        fprintf(fptr, "\n");
+    }
+    fclose(fptr);
+    return 0;
+}
+char* read_line() 
+{
+    size_t alloc_size = 1024;
+    size_t length = 0;
+    char* buffer = malloc(alloc_size);
+    while (true) 
+    {
+        char* cursor = buffer + length;
+        char* line = fgets(cursor, alloc_size - length, stdin);
+        if (!line) break;
+        length += strlen(cursor);
+        if (length < alloc_size - 1 || buffer[length - 1] == '\n') break;
+        alloc_size <<= 1;
+        buffer = realloc(buffer, alloc_size);
+        if (!buffer) 
+        {
+            buffer = '\0';
+            break;
+        }
+    }
+    if (buffer[length - 1] == '\n') {
+        buffer[length - 1] = '\0';
+        buffer = realloc(buffer, length);
+    } else {
+        buffer = realloc(buffer, length + 1);
+        buffer[length] = '\0';
+    }
+
+    return buffer;
+}
+
+char* trim_left(char* str) {
+    while (*str != '\0' && isspace(*str)) str++;
+    return str;
+}
+
+char* trim_right(char* str) {
+    if (!*str) return str;
+
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) end--;
+    *(end + 1) = '\0';
+
+    return str;
+}
+
+char** split_tokens(char* str) {
+    char** tokens = NULL;
+    char* token = strtok(str, " ");
+    int count = 0;
+
+    while (token) {
+        tokens = realloc(tokens, sizeof(char*) * ++count);
+        tokens[count - 1] = token;
+        token = strtok(NULL, " ");
+    }
+
+    return tokens;
+}
+
+int convert_to_int(char* str) {
+    char* endptr;
+    int val = strtol(str, &endptr, 10);
+    if (endptr == str || *endptr != '\0') exit(EXIT_FAILURE);
+    return val;
+}

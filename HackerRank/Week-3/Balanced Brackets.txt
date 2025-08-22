@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
+char* readLine();
+char* trimLeft(char*);
+char* trimRight(char*);
+int toInt(char*);
+char* checkBalance(char* str) {
+    int n = strlen(str);
+    char* stk = (char*)malloc(n * sizeof(char));
+    int pos = -1;
+    for (int i = 0; i < n; i++) {
+        char ch = str[i];
+        if (ch == '(' || ch == '{' || ch == '[') {
+            stk[++pos] = ch;
+        } else {
+            if (pos == -1) {
+                free(stk);
+                return "NO";
+            }
+            char last = stk[pos--];
+            if ((ch == ')' && last != '(') ||
+                (ch == '}' && last != '{') ||
+                (ch == ']' && last != '[')) {
+                free(stk);
+                return "NO";
+            }
+        }
+    }
+    if (pos == -1) {
+        free(stk);
+        return "YES";
+    } else {
+        free(stk);
+        return "NO";
+    }
+}
+int main() {
+    FILE* out = fopen(getenv("OUTPUT_PATH"), "w");
+    int cases = toInt(trimLeft(trimRight(readLine())));
+    for (int k = 0; k < cases; k++) {
+        char* input = readLine();
+        char* res = checkBalance(input);
+        fprintf(out, "%s\n", res);
+    }
+    fclose(out);
+    return 0;
+}
+char* readLine() {
+    size_t allocSize = 1024;
+    size_t len = 0;
+    char* buffer = malloc(allocSize);
+    while (true) {
+        char* cursor = buffer + len;
+        char* line = fgets(cursor, allocSize - len, stdin);
+        if (!line) break;
+        len += strlen(cursor);
+        if (len < allocSize - 1 || buffer[len - 1] == '\n') break;
+        allocSize <<= 1;
+        buffer = realloc(buffer, allocSize);
+        if (!buffer) return '\0';
+    }
+    if (buffer[len - 1] == '\n') {
+        buffer[len - 1] = '\0';
+        buffer = realloc(buffer, len);
+    } else {
+        buffer = realloc(buffer, len + 1);
+        buffer[len] = '\0';
+    }
+    return buffer;
+}
+char* trimLeft(char* str) {
+    while (*str && isspace(*str)) str++;
+    return str;
+}
+char* trimRight(char* str) {
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace(*end)) end--;
+    *(end + 1) = '\0';
+    return str;
+}
+int toInt(char* str) {
+    char* end;
+    int val = strtol(str, &end, 10);
+    if (end == str || *end != '\0') exit(EXIT_FAILURE);
+    return val;
+}

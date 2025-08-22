@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <string.h>
+#define LIMIT 105
+typedef struct {
+    int row, col, steps;
+} Point;
+int size;
+char board[LIMIT][LIMIT];
+int seen[LIMIT][LIMIT];
+int dRow[] = {1, -1, 0, 0};
+int dCol[] = {0, 0, 1, -1};
+int isSafe(int r, int c) {
+    return (r >= 0 && r < size && c >= 0 && c < size && board[r][c] == '.' && !seen[r][c]);
+}
+int bfsShortestPath(int sRow, int sCol, int tRow, int tCol) {
+    Point q[LIMIT * LIMIT];
+    int front = 0, back = 0;
+
+    memset(seen, 0, sizeof(seen));
+    seen[sRow][sCol] = 1;
+    q[back++] = (Point){sRow, sCol, 0};
+
+    while (front < back) {
+        Point cur = q[front++];
+
+        if (cur.row == tRow && cur.col == tCol)
+            return cur.steps;
+
+        for (int d = 0; d < 4; d++) {
+            int nr = cur.row + dRow[d];
+            int nc = cur.col + dCol[d];
+            while (nr >= 0 && nr < size && nc >= 0 && nc < size && board[nr][nc] == '.') {
+                if (!seen[nr][nc]) {
+                    seen[nr][nc] = 1;
+                    q[back++] = (Point){nr, nc, cur.steps + 1};
+                }
+                nr += dRow[d];
+                nc += dCol[d];
+            }
+        }
+    }
+    return -1;
+}
+
+int main() {
+    scanf("%d", &size);
+    for (int i = 0; i < size; i++)
+        scanf("%s", board[i]);
+
+    int startR, startC, goalR, goalC;
+    scanf("%d %d %d %d", &startR, &startC, &goalR, &goalC);
+
+    printf("%d\n", bfsShortestPath(startR, startC, goalR, goalC));
+    return 0;
+}
