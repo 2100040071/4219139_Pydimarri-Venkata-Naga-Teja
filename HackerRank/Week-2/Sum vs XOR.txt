@@ -1,0 +1,22 @@
+#include <stdio.h>
+long findSumXor(long n) 
+{
+    if (n == 0) return 1;  
+    int zeroCount = 0;
+    while (n > 0) 
+    {
+        if ((n & 1) == 0) 
+        {  
+            zeroCount++;   
+        }
+        n >>= 1;
+    }
+    return 1L << zeroCount;
+}
+int main() 
+{
+    long n;
+    scanf("%ld", &n);
+    printf("%ld\n", findSumXor(n));
+    return 0;
+}

@@ -1,0 +1,16 @@
+#include <stdio.h>
+int minPageTurns(int totalPages, int targetPage) 
+{
+    int fromFront = targetPage / 2;
+    int fromBack = (totalPages / 2) - (targetPage / 2);
+    return (fromFront < fromBack) ? fromFront : fromBack;
+}
+int main() 
+{
+    int n, p;
+    scanf("%d", &n);
+    scanf("%d", &p);
+    int result = minPageTurns(n, p);
+    printf("%d", result);
+    return 0;
+}

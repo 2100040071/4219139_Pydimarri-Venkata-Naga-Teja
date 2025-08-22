@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+char* applyCaesarCipher(char* text, int shift) 
+{
+    for (int i = 0; text[i] != '\0'; i++) 
+    {
+        if (isalpha(text[i])) 
+        {
+            char baseChar = islower(text[i]) ? 'a' : 'A';
+            text[i] = baseChar + (text[i] - baseChar + shift) % 26;
+        }
+    }
+    return text;
+}
+int main() 
+{
+    int n, k;
+    char message[101];
+    scanf("%d", &n);
+    scanf("%s", message);
+    scanf("%d", &k);
+    char* result = applyCaesarCipher(message, k);
+    printf("%s\n", result);
+    return 0;
+}
