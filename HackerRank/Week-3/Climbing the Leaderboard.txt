@@ -1,0 +1,37 @@
+#include <stdio.h>
+int main() 
+{
+    int n;
+    scanf("%d", &n);
+    int scores[n];
+    for (int i = 0; i < n; i++) 
+    {
+        scanf("%d", &scores[i]);
+    }
+    int m;
+    scanf("%d", &m);
+    int alice[m];
+    for (int i = 0; i < m; i++) 
+    {
+        scanf("%d", &alice[i]);
+    }
+    int board[n], count = 0;
+    board[count++] = scores[0];
+    for (int i = 1; i < n; i++) 
+    {
+        if (scores[i] != scores[i - 1]) 
+        {
+            board[count++] = scores[i];
+        }
+    }
+    int rankPos = count - 1;
+    for (int i = 0; i < m; i++) 
+    {
+        while (rankPos >= 0 && alice[i] >= board[rankPos]) 
+        {
+            rankPos--;
+        }
+        printf("%d\n", rankPos + 2);
+    }
+    return 0;
+}

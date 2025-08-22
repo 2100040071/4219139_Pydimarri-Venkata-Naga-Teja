@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <stdlib.h>
+int sortCompare(const void *x, const void *y) 
+{
+    return (*(int *)x - *(int *)y);
+}
+int findMinUnfairness(int windowSize, int nums[], int length) 
+{
+    qsort(nums, length, sizeof(int), sortCompare);
+    int minDiff = __INT_MAX__;
+    for (int i = 0; i <= length - windowSize; i++) 
+    {
+        int diff = nums[i + windowSize - 1] - nums[i];
+        if (diff < minDiff) 
+        {
+            minDiff = diff;
+        }
+    }
+    return minDiff;
+}
+int main() 
+{
+    int n, k;
+    scanf("%d", &n);
+    scanf("%d", &k);
+    int values[n];
+    for (int i = 0; i < n; i++) 
+    {
+        scanf("%d", &values[i]);
+    }
+    int answer = findMinUnfairness(k, values, n);
+    printf("%d", answer);
+    return 0;
+}

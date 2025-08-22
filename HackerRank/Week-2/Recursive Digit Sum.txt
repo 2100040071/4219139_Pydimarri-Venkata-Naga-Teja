@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <string.h>
+long long getDigitSum(char *numStr) 
+{
+    long long total = 0;
+    for (int i = 0; numStr[i] != '\0'; i++) 
+    {
+        total += (numStr[i] - '0');
+    }
+    return total;
+}
+int findSuperDigit(long long val) 
+{
+    if (val < 10) return (int)val;  
+    long long sum = 0;
+    while (val > 0) 
+    {
+        sum += val % 10;
+        val /= 10;
+    }
+    return findSuperDigit(sum);
+}
+int main() 
+{
+    char num[100001];
+    int repeatCount;
+    scanf("%s %d", num, &repeatCount);
+    long long initialSum = getDigitSum(num);
+    initialSum *= repeatCount;
+    int superDigit = findSuperDigit(initialSum);
+    printf("%d\n", superDigit);
+    return 0;
+}
